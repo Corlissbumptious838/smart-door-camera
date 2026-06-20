@@ -45,7 +45,7 @@ shows the feed in real time. Everything is configured from your **phone** throug
 
 ## Components (bill of materials)
 
-The links below are the exact parts used for this build (these are affiliate links):
+The links below are the exact parts used for this build:
 
 | Component | Used for | Link |
 |-----------|----------|------|
