@@ -20,6 +20,9 @@ shows the feed in real time. Everything is configured from your **phone** throug
 - **Door camera** (`doorcam/`): AI-Thinker **ESP32-CAM** serves an MJPEG stream over HTTP.
 - **Office display** (`officedisplay/`): **ESP32-S3** with a round **GC9A01** TFT (240×240, SPI) fetches the stream, decodes the JPEG frames and shows them live.
 
+
+Here you can find the 3D-print files: https://makerworld.com/en/models/2956182-smart-door-camera
+
 ---
 
 ## Features
@@ -260,6 +263,7 @@ Via the display portal → tab **Image** you can adjust the camera's image param
 
 Both modules are housed in custom 3D-printed enclosures. The display housing has an on/off toggle switch and a USB-C port; the camera housing exposes the external WiFi antenna and sits on a small mount.
 
+Here you can find the 3D-print files: https://makerworld.com/en/models/2956182-smart-door-camera
 ---
 
 ## License
